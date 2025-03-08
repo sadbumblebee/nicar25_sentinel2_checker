@@ -9,21 +9,30 @@ jobs:
   check_data:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
-      with:
-        python-version: '3.9'
-    - run: pip install notebook requests datetime pandas
-    
-    - name: Run image check
-      run: jupyter execute check_imagery.ipynb
-      
-    - name: Add and commit results
-      run: |
-        git add .
-        git config user.name "Automated"
-        git config user.email "actions@users.noreply.github.com"
-        git commit -m "Latest data"
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.9"
+      - run: pip install notebook requests datetime pandas
 
-    - name: Push latest
-      run: git push
+      - name: Run image check
+        run: jupyter execute check_imagery.ipynb
+
+      - name: Add results and config user
+        run: |
+          git add .
+          git config user.name "Automated"
+          git config user.email "actions@users.noreply.github.com"
+
+      - name: Check if there is new data
+        run: |
+          git add .
+          git diff --cached --quiet || git commit -m "Latest data"  # Only commit if changes exist
+
+      - name: Push latest
+        run: |
+          if git diff --quiet HEAD^ HEAD; then
+            echo "✅ No changes to push."
+          else
+            git push
+          fi
