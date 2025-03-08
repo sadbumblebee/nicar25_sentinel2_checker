@@ -18,9 +18,8 @@ jobs:
       - name: Run image check
         run: jupyter execute check_imagery.ipynb
 
-      - name: Add results and config user
+      - name: Config user
         run: |
-          git add .
           git config user.name "Automated"
           git config user.email "actions@users.noreply.github.com"
 
